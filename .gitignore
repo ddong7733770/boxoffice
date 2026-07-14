@@ -1,0 +1,4 @@
+# Temporary files and logs
+불필요한 작업파일/
+.agents/
+*.log
