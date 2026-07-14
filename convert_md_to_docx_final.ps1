@@ -189,3 +189,15 @@ if (-not (Test-Path $targetDir)) {
 
 Move-Item -Path $mdPath -Destination $targetDir -Force
 Write-Host "Cleanup completed successfully."
+
+# Git Auto Push
+$gitPath = "C:\Program Files\Git\cmd\git.exe"
+if (Test-Path $gitPath) {
+    Write-Host "Running Git Auto Push..."
+    & $gitPath add .
+    & $gitPath commit -m "Auto-commit: update boxoffice reports"
+    & $gitPath push origin main
+    Write-Host "Git Auto Push completed."
+} else {
+    Write-Warning "Git executable not found at $gitPath. Skipping auto-push."
+}
