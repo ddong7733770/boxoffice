@@ -201,3 +201,22 @@ if (Test-Path $gitPath) {
 } else {
     Write-Warning "Git executable not found at $gitPath. Skipping auto-push."
 }
+
+# Naver Blog Posting Pipeline
+Write-Host "Running Naver Blog integration pipeline..."
+$pythonPath = "python"
+
+# 1. 텍스트 취합 및 HTML 변환 스크립트 실행
+Write-Host "Step 1: Merging reports and generating HTML..."
+& $pythonPath process_and_verify.py
+
+# 2. 생성된 HTML로 네이버 블로그에 포스팅 시도
+if (Test-Path "blog_post.html") {
+    $todayDate = Get-Date -Format "yyyy-MM-dd"
+    $postTitle = "[$todayDate] 일별 국내/해외 박스오피스 순위 및 정보 종합 분석"
+    Write-Host "Step 2: Publishing to Naver Blog with title: $postTitle"
+    & $pythonPath publish_to_naver.py --title $postTitle
+    Write-Host "Blog publishing process completed."
+} else {
+    Write-Warning "blog_post.html was not created. Skipping blog publish."
+}
