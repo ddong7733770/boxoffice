@@ -190,33 +190,23 @@ if (-not (Test-Path $targetDir)) {
 Move-Item -Path $mdPath -Destination $targetDir -Force
 Write-Host "Cleanup completed successfully."
 
-# Git Auto Push
+# 1. 텍스트 취합 및 HTML 블로그 원고 생성
+Write-Host "Merging reports and generating blog HTML..."
+$pythonPath = "python"
+if (Test-Path "process_and_verify.py") {
+    & $pythonPath process_and_verify.py
+} else {
+    Write-Warning "process_and_verify.py not found. Skipping HTML merge."
+}
+
+# 2. Git Auto Push (DOCX 및 blog_post.html 포함)
 $gitPath = "C:\Program Files\Git\cmd\git.exe"
 if (Test-Path $gitPath) {
     Write-Host "Running Git Auto Push..."
     & $gitPath add .
-    & $gitPath commit -m "Auto-commit: update boxoffice reports"
+    & $gitPath commit -m "Auto-commit: update boxoffice reports and blog HTML"
     & $gitPath push origin main
     Write-Host "Git Auto Push completed."
 } else {
     Write-Warning "Git executable not found at $gitPath. Skipping auto-push."
-}
-
-# Naver Blog Posting Pipeline
-Write-Host "Running Naver Blog integration pipeline..."
-$pythonPath = "python"
-
-# 1. 텍스트 취합 및 HTML 변환 스크립트 실행
-Write-Host "Step 1: Merging reports and generating HTML..."
-& $pythonPath process_and_verify.py
-
-# 2. 생성된 HTML로 네이버 블로그에 포스팅 시도
-if (Test-Path "blog_post.html") {
-    $todayDate = Get-Date -Format "yyyy-MM-dd"
-    $postTitle = "[$todayDate] 일별 국내/해외 박스오피스 순위 및 정보 종합 분석"
-    Write-Host "Step 2: Publishing to Naver Blog with title: $postTitle"
-    & $pythonPath publish_to_naver.py --title $postTitle
-    Write-Host "Blog publishing process completed."
-} else {
-    Write-Warning "blog_post.html was not created. Skipping blog publish."
 }
